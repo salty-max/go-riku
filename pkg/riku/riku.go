@@ -1,6 +1,7 @@
 package riku
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/salty-max/go-riku/pkg/cpu"
@@ -30,9 +31,15 @@ func (riku *Riku) Init() {
 }
 
 func (riku *Riku) Boot(program []byte) {
+	if len(program) > util.ROM_SIZE {
+		panic("Program too large")
+	}
+	if len(program) > 0 {
+		riku.loadROM(program)
+	}
+
 	riku.MM.Reset()
 	riku.Cpu.Reset()
-	riku.loadROM(program)
 	riku.loop()
 }
 
@@ -55,5 +62,22 @@ func (riku *Riku) loadROM(program []byte) {
 }
 
 func (riku *Riku) loop() {
+	riku.MM.Load([]byte{0xA9, 0x84, 0x20, 0x64, 0x16}, util.ROM_START)
+	riku.MM.Load([]byte{0xA9, 0x42}, 0x1664)
+
+	// for cycle := 0; cycle < riku.clockSpeed; cycle++ {
+	// 	riku.Cpu.Cycle()
+	// 	if cycle == vBlankInterruptCycle {
+	// 		cpu.RequestInterrupt(VBlankInterrupt)
+	// 	}
+	// }
+
+	fmt.Printf("PC: %d\n", riku.Cpu.ReadRegister16(6))
 	riku.Cpu.Cycle()
+	fmt.Printf("PC: %d\n", riku.Cpu.ReadRegister16(6))
+	riku.Cpu.Cycle()
+	fmt.Printf("PC: %d\n", riku.Cpu.ReadRegister16(6))
+	riku.Cpu.Cycle()
+	fmt.Printf("PC: %d\n", riku.Cpu.ReadRegister16(6))
+	fmt.Printf("A: %d", riku.Cpu.ReadRegister8(3))
 }

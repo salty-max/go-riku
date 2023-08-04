@@ -66,12 +66,17 @@ func (r *ROM) Read16(offset uint16) uint16 {
 func (r *ROM) Write(offset uint16, value byte) {
 	fmt.Println("Cannot write to ROM")
 }
+
 func (r *ROM) Write16(offset uint16, value uint16) {
 	fmt.Println("Cannot write to ROM")
 }
 
 func (r *ROM) Load(buffer []byte, offset uint16) {
-	copy(r.Buffer, buffer[offset:])
+	if int(offset)+len(buffer) > len(r.Buffer) {
+		fmt.Println("Error: Not enough space in ROM buffer")
+		return
+	}
+	copy(r.Buffer[offset:], buffer)
 }
 
 func (r *ROM) Slice(start uint16, end uint16) []byte {

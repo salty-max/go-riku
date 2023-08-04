@@ -31,4 +31,30 @@ var INSTRUCTIONS = InstructionMap{
 			ldaSetStatus(cpu)
 		},
 	},
+	0xA5: Instruction{
+		Name: "LDA_ZP",
+		Exec: func(cpu *CPU) {
+			zp := cpu.fetch()
+			cpu.WriteRegister8(A, cpu.Memory.Read(uint16(zp)))
+			ldaSetStatus(cpu)
+		},
+	},
+	0xB5: Instruction{
+		Name: "LDA_ZP_X",
+		Exec: func(cpu *CPU) {
+			zp := cpu.fetch()
+			offset := cpu.ReadRegister8(RX)
+			value := cpu.Memory.Read(uint16(zp) + uint16(offset))
+			cpu.WriteRegister8(A, value)
+			ldaSetStatus(cpu)
+		},
+	},
+	0x20: Instruction{
+		Name: "JSR",
+		Exec: func(cpu *CPU) {
+			addr := cpu.fetch16()
+			cpu.push(cpu.ReadRegister16(PC))
+			cpu.WriteRegister16(PC, addr)
+		},
+	},
 }
